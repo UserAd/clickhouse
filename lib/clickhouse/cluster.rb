@@ -32,7 +32,7 @@ module Clickhouse
   private
 
     def method_missing(*args, &block)
-      pond.checkout do |connection|
+      pond.checkout(scope: "clickhouse_client".freeze) do |connection|
         connection.send(*args, &block)
       end
     rescue ::Clickhouse::ConnectionError

@@ -138,11 +138,16 @@ ENGINE = MergeTree(date, 8192)
               67890,Bruce,Wayne
             CSV
             @csv.gsub!(/^\s+/, "")
+
+            @json = [
+              {:id => 12345, :first_name => "Paul", :last_name => "Engel"},
+              {:id => 67890, :first_name => "Bruce", :last_name => "Wayne"}
+            ].to_json
           end
 
           describe "when using hashes" do
             it "sends a POST request containing a 'INSERT INTO' statement using CSV" do
-              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns("")
+              @connection.expects(:post).with("INSERT INTO logs FORMAT JSONEachRow", @json).returns("")
               assert_equal true, @connection.insert_rows("logs") { |rows|
                 rows << {:id => 12345, :first_name => "Paul", :last_name => "Engel"}
                 rows << {:id => 67890, :first_name => "Bruce", :last_name => "Wayne"}
@@ -152,7 +157,7 @@ ENGINE = MergeTree(date, 8192)
 
           describe "when using arrays" do
             it "sends a POST request containing a 'INSERT INTO' statement using CSV" do
-              @connection.expects(:post).with("INSERT INTO logs FORMAT CSVWithNames", @csv).returns("")
+              @connection.expects(:post).with("INSERT INTO logs FORMAT JSONEachRow", @json).returns("")
               assert_equal true, @connection.insert_rows("logs", :names => %w(id first_name last_name)) { |rows|
                 rows << [12345, "Paul", "Engel"]
                 rows << [67890, "Bruce", "Wayne"]
