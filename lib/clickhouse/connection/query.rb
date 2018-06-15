@@ -111,8 +111,8 @@ module Clickhouse
       def generate_json(rows, names = nil)
         hashes = rows[0].is_a?(Hash)
         rows.collect do |row|
-          hashes ? row : Hash[names.zip(row)]
-        end.to_json
+          hashes ? row.to_json : Hash[names.zip(row)].to_json
+        end.join("\n")
       end
 
       def inspect_value(value)
